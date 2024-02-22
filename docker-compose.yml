@@ -1,0 +1,42 @@
+services:
+  jenkins:
+    image: jenkins:0.0.1
+    container_name: jenkins
+    user: root
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+    networks:
+      - back
+
+    environment:
+      - DOCKER_GID_ON_HOST=501 # Puedes obtener el GID de docker en tu host con el comando: id -g docker
+    privileged: true
+
+  
+  vault:
+    image: vault:1.13.3
+    container_name: vault
+    restart: on-failure
+    ports:
+      - "8201:8201"
+    environment:
+      VAULT_ADDR: 'https://0.0.0.0:8201'
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - vault-volume:/data
+    healthcheck:
+      test: ["CMD", "vault", "status"]
+      retries: 5
+    networks:
+      - back
+      
+volumes:
+  jenkins_home:
+  vault-volume:
+
+networks:
+  back:
