@@ -57,19 +57,19 @@ vault token create -no-default-policy
 {"request_id":"c07e1d27-85da-3ce7-e8f6-1989641fdfb4","lease_id":"","renewable":false,"lease_duration":0,"data":null,"wrap_info":null,"warnings":null,"auth":{"client_token":"hvs.CAESIKy4tQWEStyU1MZ11rU-JSbfMqCetYotmceKsg-vAHvzGh4KHGh2cy40am1WOG9USGhKZnltVmhFR08wSnk1MWY","accessor":"PEQCDZESmAc9rwiQumNr1dqI","policies":["default","jenkins"],"token_policies":["default","jenkins"],"metadata":{"role_name":"jenkins-role"},"lease_duration":1200,"renewable":true,"entity_id":"f5798c1d-9738-d60c-0c95-d77cb44a5af5","token_type":"service","orphan":true,"mfa_requirement":null,"num_uses":10}}
 ```
 
-**request_id**: Es un identificador único para cada solicitud al Vault. Cada vez que se realiza una solicitud, se genera un nuevo request_id.
-**client_token**: Es el token de cliente que se utiliza para realizar operaciones en el Vault. Cada solicitud de token exitosa generará un nuevo token de cliente, que es válido durante un período de tiempo específico.
-**accessor**: Es un identificador único para la entidad asociada al token. Se utiliza internamente por Vault para hacer referencia al token.
-**policies**: Es una lista de políticas asociadas con el token. Las políticas definen qué operaciones puede realizar el token en el Vault.
-**token_policies**: Es similar a "policies", pero representa las políticas efectivas del token. Estas pueden ser diferentes de las políticas originales si hay políticas globales que se aplican.
- **metadata**: Contiene metadatos adicionales sobre el token, como el nombre del rol asociado al token.
-**lease_duration**: Es la duración del tiempo de vida del token, es decir, cuánto tiempo será válido el token antes de expirar.
-**renewable**: Indica si el token es renovable o no. Si es renovable, puede ser renovado antes de que expire.
-**entity_id**: Es un identificador único para la entidad asociada al token, similar al accessor.
-**token_type**: Indica el tipo de token. En este caso, ambos son tokens de servicio.
-**orphan**: Indica si el token es huérfano o no. Un token huérfano es un token que no tiene un padre asociado.
-**mfa_requirement**: Indica si se requiere autenticación de múltiples factores para este token.
-**num_uses**: Indica el número de veces que el token se ha utilizado hasta el momento.
+- **request_id**: Es un identificador único para cada solicitud al Vault. Cada vez que se realiza una solicitud, se genera un nuevo request_id.
+-  **client_token**: Es el token de cliente que se utiliza para realizar operaciones en el Vault. Cada solicitud de token exitosa generará un nuevo token de cliente, que es válido durante un período de tiempo específico.
+-  **accessor**: Es un identificador único para la entidad asociada al token. Se utiliza internamente por Vault para hacer referencia al token.
+-  **policies**: Es una lista de políticas asociadas con el token. Las políticas definen qué operaciones puede realizar el token en el Vault.
+-  **token_policies**: Es similar a "policies", pero representa las políticas efectivas del token. Estas pueden ser diferentes de las políticas originales si hay políticas globales que se aplican.
+- **metadata**: Contiene metadatos adicionales sobre el token, como el nombre del rol asociado al token.
+- **lease_duration**: Es la duración del tiempo de vida del token, es decir, cuánto tiempo será válido el token antes de expirar.
+- **renewable**: Indica si el token es renovable o no. Si es renovable, puede ser renovado antes de que expire.
+- **entity_id**: Es un identificador único para la entidad asociada al token, similar al accessor.
+- *token_type**: Indica el tipo de token. En este caso, ambos son tokens de servicio.
+- **orphan**: Indica si el token es huérfano o no. Un token huérfano es un token que no tiene un padre asociado.
+- **mfa_requirement**: Indica si se requiere autenticación de múltiples factores para este token.
+- **num_uses**: Indica el número de veces que el token se ha utilizado hasta el momento.
 
 
 curl \
