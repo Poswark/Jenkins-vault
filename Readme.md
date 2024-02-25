@@ -22,7 +22,7 @@ vault operator init -key-shares=1 -key-threshold=1
 
 vault operator unseal
 
-export VAULT_TOKEN=hvs.Xg6fI2NZOqs1tegnlwoNLv4S
+export VAULT_TOKEN=hvs....
 
 vault login
 
@@ -40,10 +40,10 @@ vault write secrets/creds/my-secret-jenkins secret=Jenkins!321
 
 vault policy write jenkins jenkins-policy.hcl 
 
-vault token lookup hvs.CAESIDa4azasfi-l7lYyVY5jhHPkZJidmTP1dUypKOyo0pG3Gh4KHGh2cy5XZkRqM2hodTRyQU5ZSm9MejMwb1ZPbm4
+vault token lookup hvs.432
  
 curl \
-    --header "X-Vault-Token: hvs.dLXtGrkntXngWww8JUnBHzqh" \
+    --header "X-Vault-Token: hvs.?..." \
     --request POST \
     --data '{"policies": "jenkins"}' \
     http://127.0.0.1:8200/v1/auth/approle/role/jenkins-role
@@ -54,7 +54,7 @@ vault token create -no-default-policy
 ```
 
 ```json
-{"request_id":"c07e1d27-85da-3ce7-e8f6-1989641fdfb4","lease_id":"","renewable":false,"lease_duration":0,"data":null,"wrap_info":null,"warnings":null,"auth":{"client_token":"hvs.CAESIKy4tQWEStyU1MZ11rU-JSbfMqCetYotmceKsg-vAHvzGh4KHGh2cy40am1WOG9USGhKZnltVmhFR08wSnk1MWY","accessor":"PEQCDZESmAc9rwiQumNr1dqI","policies":["default","jenkins"],"token_policies":["default","jenkins"],"metadata":{"role_name":"jenkins-role"},"lease_duration":1200,"renewable":true,"entity_id":"f5798c1d-9738-d60c-0c95-d77cb44a5af5","token_type":"service","orphan":true,"mfa_requirement":null,"num_uses":10}}
+{"request_id":"c07e1d27-85da-3ce7-e8f6-1989641fdfb4","lease_id":"","renewable":false,"lease_duration":0,"data":null,"wrap_info":null,"warnings":null,"auth":{"client_token":"hvs.CA","accessor":"PEQCDZESmAc9rwiQumNr1dqI","policies":["default","jenkins"],"token_policies":["default","jenkins"],"metadata":{"role_name":"jenkins-role"},"lease_duration":1200,"renewable":true,"entity_id":"f5798c1d-9738-d60c-0c95-d77cb44a5af5","token_type":"service","orphan":true,"mfa_requirement":null,"num_uses":10}}
 ```
 
 - **request_id**: Es un identificador único para cada solicitud al Vault. Cada vez que se realiza una solicitud, se genera un nuevo request_id.
@@ -79,22 +79,22 @@ curl \
 
 
 curl \
-    --header "X-Vault-Token: hvs.dLXtGrkntXngWww8JUnBHzqh" \
+    --header "X-Vault-Token: hvs...." \
     --request GET \
     http://127.0.0.1:8200/v1/secrets/creds/my-secret-jenkins
 
 curl \
-    --header "X-Vault-Token: hvs.CAESIEcgOPIWgishHpGzB63xOaf363PuwePltznieUUzTHhjGh4KHGh2cy5TVzk1R3dmeHg5V2dUbDU2UHk4Z09qS04" \
+    --header "X-Vault-Token: hvs..--" \
     --request GET \                                                                                                 
     http://127.0.0.1:8200/v1/secrets/creds/my-secret-jenkins
 
 curl \
-    --header "X-Vault-Token: hvs.CAESIAVKaWOqrSTEhRpDxE93bjab6sjl9tKUEWtSJ-KIBLn-Gh4KHGh2cy5lUWhtVHFqVjJZUjZuVFNxVUVQeEcwczU" \
+    --header "X-Vault-Token: hvs.-KIBLn.--" \
     --request GET \
     http://127.0.0.1:8200/v1/secrets/creds/my-secret-jenkins
 
     curl \
-    --header "X-Vault-Token: hvs.Xg6fI2NZOqs1tegnlwoNLv4S" \
+    --header "X-Vault-Token: hvs...." \
     --request POST \
     --data '{"policies": "jenkins"}' \
     http://127.0.0.1:8200/v1/auth/approle/role/my-role
