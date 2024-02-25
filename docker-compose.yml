@@ -10,9 +10,9 @@ services:
       - jenkins_home:/var/jenkins_home
     networks:
       - back
-
     environment:
       - DOCKER_GID_ON_HOST=501 # Puedes obtener el GID de docker en tu host con el comando: id -g docker
+      - VAULT_ADDR=http://vault:8200
     privileged: true
 
   
@@ -22,12 +22,15 @@ services:
     restart: on-failure
     ports:
       - "8201:8201"
-    environment:
-      VAULT_ADDR: 'https://0.0.0.0:8201'
+      - "8200:8200"
     cap_add:
       - IPC_LOCK
+    environment:
+      - VAULT_ADDR=http://vault:8200
+    #command: vault server  -config=/vault/file/vault_config.hcl
+    #user: "501"
     volumes:
-      - vault-volume:/data
+      - vault-volume:/vault/data
     healthcheck:
       test: ["CMD", "vault", "status"]
       retries: 5
