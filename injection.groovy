@@ -15,58 +15,63 @@ pipeline {
         password(name: 'SECRET_VALUE5', defaultValue: '', description: 'Valor del secreto 5 (opcional)')
     }
     environment {
-        VAULT_SERVER = "http://vault:8200" // Cambia la URL según tu configuración
+        VAULT_SERVER = "http://vault:8200" // Cambia esta URL según tu configuración
     }
     stages {
         stage('Check or Create Secret') {
             steps {
                 script {
-                    // Construcción del payload dinámico
-                    def payloadFile = "vault_payload.json"
-                    def payload = '{'
-                    for (int i = 1; i <= 5; i++) {
-                        def key = params["SECRET_KEY${i}"]
-                        def value = params["SECRET_VALUE${i}"]
-                        if (key && value) {
-                            payload += "\"${key}\": \"${value}\","
+                    // Función para construir el payload
+                    def buildPayload = {
+                        def data = [:]
+                        for (int i = 1; i <= 5; i++) {
+                            def key = params["SECRET_KEY${i}"]
+                            def value = params["SECRET_VALUE${i}"]
+                            if (key?.trim() && value) {
+                                // Convertir valores sensibles a texto plano
+                                value = value instanceof hudson.util.Secret ? value.getPlainText() : value
+                                data[key.trim()] = value.trim()
+                            }
                         }
+                        // Crear el objeto final con el formato requerido
+                        return groovy.json.JsonOutput.toJson([data: data])
                     }
-                    payload = payload[0..-2] + '}' // Elimina la última coma y cierra el JSON
 
-                    // Escribir el payload a un archivo temporal
-                    writeFile file: payloadFile, text: payload
+                    // Escribir el payload en un archivo
+                    def payloadFile = "vault_payload.json"
+                    writeFile file: payloadFile, text: buildPayload()
 
-                    // Configuración para ocultar el token en los logs
-                    withEnv(["VAULT_TOKEN=${params.VAULT_TOKEN}"]) {
-                        // Verificar si el secreto ya existe
-                        def checkCommand = """
-                            curl --silent --header "X-Vault-Token: $VAULT_TOKEN" \
-                                 --request GET \
+                    // Verificar si el secreto ya existe en Vault
+                    def checkCommand = """
+                        set +x
+                        curl --silent --header "X-Vault-Token: $VAULT_TOKEN" \
+                             --request GET \
+                             $VAULT_SERVER/v1/secrets/creds/${params.VAULT_PATH}
+                    """
+                    def checkResponse = sh(script: checkCommand, returnStdout: true).trim()
+
+                    if (checkResponse.contains('"data"')) {
+                        echo "Secreto encontrado en ${params.VAULT_PATH}. Realizando patch..."
+                        // Realizar patch si el secreto ya existe
+                        sh(script: """
+                            set +x
+                            curl --header "X-Vault-Token: $VAULT_TOKEN" \
+                                 --header "Content-Type: application/merge-patch+json" \
+                                 --request PATCH \
+                                 --data @${payloadFile} \
                                  $VAULT_SERVER/v1/secrets/creds/${params.VAULT_PATH}
-                        """
-                        def checkResponse = sh(script: checkCommand, returnStdout: true).trim()
-
-                        if (checkResponse.contains('"data"')) {
-                            echo "Secreto encontrado en ${params.VAULT_PATH}. Realizando patch..."
-                            // Realizar patch si el secreto ya existe
-                            sh(script: """
-                                curl --header "X-Vault-Token: $VAULT_TOKEN" \
-                                     --header "Content-Type: application/json" \
-                                     --request POST \
-                                     --data @${payloadFile} \
-                                     $VAULT_SERVER/v1/secrets/creds/${params.VAULT_PATH}
-                            """, returnStdout: true)
-                        } else {
-                            echo "No se encontró secreto en ${params.VAULT_PATH}. Creando nuevo secreto..."
-                            // Crear secreto si no existe
-                            sh(script: """
-                                curl --header "X-Vault-Token: $VAULT_TOKEN" \
-                                     --header "Content-Type: application/json" \
-                                     --request POST \
-                                     --data @${payloadFile} \
-                                     $VAULT_SERVER/v1/secrets/creds/${params.VAULT_PATH}
-                            """, returnStdout: true)
-                        }
+                        """)
+                    } else {
+                        echo "No se encontró secreto en ${params.VAULT_PATH}. Creando nuevo secreto..."
+                        // Crear secreto si no existe
+                        sh(script: """
+                            set +x
+                            curl --header "X-Vault-Token: $VAULT_TOKEN" \
+                                 --header "Content-Type: application/json" \
+                                 --request POST \
+                                 --data @${payloadFile} \
+                                 $VAULT_SERVER/v1/secrets/creds/${params.VAULT_PATH} 
+                        """)
                     }
 
                     // Limpiar archivos sensibles
